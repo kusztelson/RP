@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Ustawienia
-n_clusters = 5  # Liczba klastrów wyciągnięta do zmiennej
+n_clusters = 4  # Liczba klastrów wyciągnięta do zmiennej
 grade_cols = ['ST_Sgrade_Math', 'ST_Sgrade_Read_Lang']
 
 # Wczytywanie danych
@@ -37,14 +37,14 @@ df = df[
     #"ST_ARS",
     #"ST_ARS_PAIRS",
     #"IMMBACK",
-    "ST_st_relteach",
-    "ST_st_bully",
-    "ST_st_belong",
-    "ST_st_friends",
-    "ST_st_relpar",
-    "ST_st_globalmind",
-    "ST_st_wellbeing",
-    "ST_st_anxtest",
+    "ST_st_relteach",   # bully reltech and anxtest together rmsea - 0.035 (Cohort) , 0.056 (site) , 0.035 (gender)
+    "ST_st_bully",      # bully reltech and anxtest together rmsea - 0.035 (Cohort) , 0.056 (site) , 0.035 (gender)
+    "ST_st_belong",    # rmsea - 0.064 (Cohort) , 0.075 (site) , 0.044 (gender)
+    "ST_st_friends",   # friends and parents together # rmsea - 0.030 (Cohort) , 0.065 (site) , 0.028 (gender)
+    "ST_st_relpar",    # friends and parents together # rmsea - 0.030 (Cohort) , 0.065 (site) , 0.028 (gender)
+    "ST_st_globalmind",   # rmsea - 0.099 (Cohort) , 0.134 (site) , 0.086 (gender) # aboce 0.1 = pproblem withh generalization across sites
+    "ST_st_wellbeing",   # rmsea - 0.066 (Cohort) , 0.075 (site) , 0.070 (gender)
+    "ST_st_anxtest",        # bully reltech and anxtest together rmsea - 0.035 (Cohort) , 0.056 (site) , 0.035 (gender)
     "ST_SES",
     'ST_Sgrade_Math',
     'ST_Sgrade_Read_Lang'
