@@ -121,12 +121,102 @@ for site in unique_sites:
     profile = site_data.groupby('Cluster_Labels')[grade_columns].apply(
         lambda x: pd.Series({col: weighted_avg(x[col]) for col in grade_columns})
     )
+
+    # Rename columns to avoid collision with original grades
+    # This changes 'ST_Sgrade_Math' to 'Cluster_Mean_ST_Sgrade_Math'
+    profile_renamed = profile.add_prefix('Cluster_Mean_')
+    
+    # Merge the profile data back into site_data
+    # We map the cluster averages to each student based on their 'Cluster_Labels'
+    site_data = site_data.merge(
+        profile_renamed, 
+        left_on='Cluster_Labels', 
+        right_index=True, 
+        how='left'
+    )
+
     print(profile)
     print("\n")
+
+    # Add PCA coordinates to dataframe for plotting later
+    for i in range(min(2, pca.n_components_)): # Store first 3 components
+        site_data[f'PCA_{i+1}'] = X_pca_for_kmeans[:, i]
 
     # Store result
     results[site] = site_data
 
 # Combine
 final_df = pd.concat(results.values())
+# %%
+
+# 1. Output Directory
+output_folder = 'plots'
+
+# 2. Define the pre-calculated profile columns
+profile_cols = [
+    'Cluster_Mean_ST_Sgrade_Math', 
+    'Cluster_Mean_ST_Sgrade_Read_Lang', 
+    'Cluster_Mean_ST_Sgrade_Arts'
+]
+
+# 3. Visualization Loop
+unique_sites = final_df['ST_SiteID'].unique()
+
+print(f"Generating plots for {len(unique_sites)} sites...")
+
+for site in unique_sites:
+    # Filter data for the specific site
+    site_data = final_df[final_df['ST_SiteID'] == site]
+    
+    # Create the figure with 2 subplots
+    fig, axes = plt.subplots(1, 2, figsize=(18, 6))
+    
+    # --- Plot 1: PCA Cluster Map (Scatter) ---
+    sns.scatterplot(
+        data=site_data, 
+        x='PCA_1', 
+        y='PCA_2', 
+        hue='Cluster_Labels', 
+        palette='viridis', 
+        alpha=0.6, 
+        s=50, 
+        ax=axes[0]
+    )
+    axes[0].set_title(f'Student Clusters (Site: {site})')
+    axes[0].set_xlabel('Principal Component 1')
+    axes[0].set_ylabel('Principal Component 2')
+    axes[0].legend(title='Cluster')
+    
+    # --- Plot 2: Academic Profile (Bar Chart) ---
+    # Efficiently extract the pre-calculated means
+    # We drop duplicates because every student in the same cluster has the same mean value
+    profile_plot_data = site_data[['Cluster_Labels'] + profile_cols].drop_duplicates()
+    
+    # Set index for plotting and sort
+    profile_plot_data = profile_plot_data.set_index('Cluster_Labels').sort_index()
+    
+    # Clean up column names for the legend (Remove prefix)
+    profile_plot_data.columns = [c.replace('Cluster_Mean_ST_Sgrade_', '') for c in profile_plot_data.columns]
+    
+    # Plot
+    profile_plot_data.plot(kind='bar', ax=axes[1], colormap='Paired', edgecolor='black', zorder=3)
+    
+    axes[1].set_title(f'Academic Performance by Cluster (Site: {site})')
+    axes[1].set_ylabel('Weighted Mean Grade')
+    axes[1].set_xlabel('Cluster Group')
+    axes[1].set_ylim(20, 50) # Adjust this range based on your data's scale
+    axes[1].grid(axis='y', linestyle='--', alpha=0.5, zorder=0)
+    axes[1].legend(title='Subject', loc='lower right')
+    
+    # --- Save and Close ---
+    plt.tight_layout()
+    
+    # Save file using the site ID as the name
+    filename = os.path.join(output_folder, f"{site}.png")
+    plt.savefig(filename, dpi=100)
+    plt.close(fig) # Close figure to free memory
+    
+    print(f"Saved: {filename}")
+
+print("All plots generated.")
 # %%
