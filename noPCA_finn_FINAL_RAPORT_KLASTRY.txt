@@ -1,0 +1,76 @@
+============================================================
+RAPORT KLASTRÓW SSES (FINLANDIA, COHORT 2)
+Liczba studentów (N): 720
+============================================================
+
+LEGENDA:
+  - Mean: Średnia ważona w klastrze
+  - Diff: Różnica względem średniej globalnej (Mean - Global)
+------------------------------------------------------------
+
+KLASTER 0  (N = 268 | 37.2% populacji)
+------------------------------------------------------------
+CECHA / ZMIENNA           |     MEAN |     DIFF
+------------------------------------------------------------
+ [ WYNIKI W NAUCE ]
+ST_Sgrade_Math            |    30.40 |    -1.06
+ST_Sgrade_Read_Lang       |    29.77 |    -1.27
+
+ [ CECHY PSYCHOLOGICZNE ]
+ST_st_bully (*)           |    56.42 |    +8.69
+ST_st_relpar (*)          |    60.69 |    +7.75
+ST_st_anxtest             |    51.35 |    +4.55
+ST_SES                    |     0.59 |    -0.05
+ST_st_relteach            |    44.48 |    -4.72
+ST_SEL_WLE_ADJ            |   519.46 |   -35.87
+ST_RES_WLE_ADJ (*)        |   516.97 |   -42.24
+ST_st_wellbeing (*)       |    38.28 |    -6.52
+ST_st_belong (*)          |    40.91 |    -8.23
+ST_st_friends (*)         |    42.46 |    -8.90
+
+============================================================
+
+KLASTER 1  (N = 114 | 15.8% populacji)
+------------------------------------------------------------
+CECHA / ZMIENNA           |     MEAN |     DIFF
+------------------------------------------------------------
+ [ WYNIKI W NAUCE ]
+ST_Sgrade_Math            |    33.00 |    +1.54
+ST_Sgrade_Read_Lang       |    32.81 |    +1.77
+
+ [ CECHY PSYCHOLOGICZNE ]
+ST_st_belong (*)          |    65.97 |   +16.83
+ST_RES_WLE_ADJ (*)        |   655.05 |   +95.84
+ST_SEL_WLE_ADJ (*)        |   639.95 |   +84.62
+ST_st_wellbeing (*)       |    55.61 |   +10.81
+ST_st_friends (*)         |    62.30 |   +10.93
+ST_st_relteach (*)        |    55.38 |    +6.18
+ST_SES                    |     0.56 |    -0.08
+ST_st_anxtest             |    43.24 |    -3.55
+ST_st_bully (*)           |    40.66 |    -7.07
+ST_st_relpar (*)          |    43.68 |    -9.26
+
+============================================================
+
+KLASTER 2  (N = 338 | 46.9% populacji)
+------------------------------------------------------------
+CECHA / ZMIENNA           |     MEAN |     DIFF
+------------------------------------------------------------
+ [ WYNIKI W NAUCE ]
+ST_Sgrade_Math            |    31.74 |    +0.27
+ST_Sgrade_Read_Lang       |    31.38 |    +0.34
+
+ [ CECHY PSYCHOLOGICZNE ]
+ST_st_friends             |    54.29 |    +2.92
+ST_st_relteach            |    50.62 |    +1.42
+ST_st_wellbeing           |    45.97 |    +1.17
+ST_SES                    |     0.70 |    +0.06
+ST_st_belong              |    49.51 |    +0.37
+ST_RES_WLE_ADJ            |   557.83 |    -1.38
+ST_SEL_WLE_ADJ            |   553.03 |    -2.30
+ST_st_anxtest             |    44.60 |    -2.20
+ST_st_relpar              |    50.31 |    -2.63
+ST_st_bully               |    43.63 |    -4.10
+
+============================================================
+

@@ -23,16 +23,23 @@ print("Inside finns Site", df_fin.groupby(['ST_CohortID','ST_Gender_Std']).size(
 # Specific filter for Cohort 2.0 and Gender 2.0
 df = df_fin[(df_fin['ST_CohortID'] == 2.0) & (df_fin['ST_Gender_Std'] == 2.0)]
 
-# Column selection
+# # Column selection
+# columns_to_keep = [
+#     "ST_ASS_WLE_ADJ", "ST_COO_WLE_ADJ", "ST_CRE_WLE_ADJ", "ST_CUR_WLE_ADJ",
+#     "ST_EFF_WLE_ADJ", "ST_EMO_WLE_ADJ", "ST_EMP_WLE_ADJ", "ST_ENE_WLE_ADJ",
+#     "ST_MOT_WLE_ADJ", "ST_OPT_WLE_ADJ", "ST_PER_WLE_ADJ", "ST_RES_WLE_ADJ",
+#     "ST_SEL_WLE_ADJ", "ST_SOC_WLE_ADJ", "ST_STR_WLE_ADJ", "ST_TOL_WLE_ADJ",
+#     "ST_TRU_WLE_ADJ", "ST_st_relteach", "ST_st_bully", "ST_st_belong", 
+#     "ST_st_friends", "ST_st_relpar", "ST_st_globalmind", "ST_st_wellbeing", 
+#     "ST_st_anxtest", "ST_SES"
+# ] + grade_cols
 columns_to_keep = [
-    "ST_ASS_WLE_ADJ", "ST_COO_WLE_ADJ", "ST_CRE_WLE_ADJ", "ST_CUR_WLE_ADJ",
-    "ST_EFF_WLE_ADJ", "ST_EMO_WLE_ADJ", "ST_EMP_WLE_ADJ", "ST_ENE_WLE_ADJ",
-    "ST_MOT_WLE_ADJ", "ST_OPT_WLE_ADJ", "ST_PER_WLE_ADJ", "ST_RES_WLE_ADJ",
-    "ST_SEL_WLE_ADJ", "ST_SOC_WLE_ADJ", "ST_STR_WLE_ADJ", "ST_TOL_WLE_ADJ",
-    "ST_TRU_WLE_ADJ", "ST_st_relteach", "ST_st_bully", "ST_st_belong", 
-    "ST_st_friends", "ST_st_relpar", "ST_st_globalmind", "ST_st_wellbeing", 
+     "ST_RES_WLE_ADJ",
+    "ST_SEL_WLE_ADJ", "ST_st_relteach", "ST_st_bully", "ST_st_belong", 
+    "ST_st_friends", "ST_st_relpar", "ST_st_wellbeing", 
     "ST_st_anxtest", "ST_SES"
 ] + grade_cols
+
 
 df = df[columns_to_keep]
 df1 = df.dropna()
