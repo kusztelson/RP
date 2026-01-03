@@ -74,20 +74,23 @@ for site in unique_sites:
     # ---------------------------------------------------------
     # B. Weighted PCA (Square Root Weight Method)
     # ---------------------------------------------------------
+
+    scaler = StandardScaler()
     
-    # 1. Weighted Mean
-    weighted_mean = np.average(X, axis=0, weights=w)
+    # Critical: Fit with sample_weight to get Weighted Mean and Weighted Std
+    scaler.fit(X, sample_weight=w)
     
-    # 2. Center Data
-    X_centered = X - weighted_mean
+    # Transform: This makes Mean=0 and Std=1 for all columns
+    X_std = scaler.transform(X)
     
     # 3. Apply Square Root Weight for PCA calculation only
+    # We apply this to the STANDARDIZED data now
     w_sqrt = np.sqrt(w).reshape(-1, 1)
-    X_weighted_centered = X_centered * w_sqrt
+    X_weighted_std = X_std * w_sqrt   # <--- Changed X_centered to X_std
     
     # 4. Fit PCA
     pca = PCA(n_components=0.95) 
-    pca.fit(X_weighted_centered)
+    pca.fit(X_weighted_std)           # <--- Changed input to X_weighted_std
 
     pca_models[site] = pca
     
@@ -97,11 +100,12 @@ for site in unique_sites:
     # C. Weighted K-Means
     # ---------------------------------------------------------
     
-    # Project CENTERED data (not weighted data) onto PCA components
-    X_pca_for_kmeans = pca.transform(X_centered)
+    # Project STANDARDIZED data (not weighted data) onto PCA components
+    # We use X_std here because it represents the physical location in 'Standard Units'
+    X_pca_for_kmeans = pca.transform(X_std)  # <--- Changed X_centered to X_std
     
     # Run Weighted K-Means
-    k = 3 # You can change this or loop to find optimal k
+    k = 3 
     kmeans = KMeans(n_clusters=k, random_state=42)
     kmeans.fit(X_pca_for_kmeans, sample_weight=w)
     
