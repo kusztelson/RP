@@ -149,8 +149,46 @@ for site in unique_sites:
 final_df = pd.concat(results.values())
 # %%
 
-# 1. Output Directory
+# ---------------------------------------------------------
+# Post-Processing: Reorder Clusters based on PCA_1
+# ---------------------------------------------------------
+
+def reorder_clusters(site_df):
+    """
+    Reorders cluster labels within a site such that:
+    0 = Lowest average PCA_1
+    1 = Middle average PCA_1
+    2 = Highest average PCA_1
+    """
+    # 1. Calculate the mean PCA_1 for each existing cluster label
+    cluster_stats = site_df.groupby('Cluster_Labels')['PCA_1'].mean()
+    
+    # 2. Sort the clusters by their mean PCA_1 value (Ascending)
+    # The index will be the Old Label, the position will be the New Label (0, 1, 2)
+    sorted_clusters = cluster_stats.sort_values().index
+    
+    # 3. Create a mapping dictionary: {Old_Label: New_Label}
+    # enumerate gives us (0, Old_Label_1), (1, Old_Label_2)...
+    # We flip it to create {Old_Label_1: 0, Old_Label_2: 1...}
+    mapping = {old_lbl: new_lbl for new_lbl, old_lbl in enumerate(sorted_clusters)}
+    
+    # 4. Apply the mapping
+    site_df['Ordered_Cluster'] = site_df['Cluster_Labels'].map(mapping)
+    
+    return site_df
+
+# Apply the function to each site independently
+final_df = final_df.groupby('ST_SiteID', group_keys=False).apply(reorder_clusters)
+
+# Optional: Verify the new order
+print("Checking Cluster Order (Expect ascending PCA_1 means):")
+print(final_df.groupby('Ordered_Cluster')['PCA_1'].mean())
+
+# 1. Setup Output Directory
 output_folder = 'plots'
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+    print(f"Created directory: {output_folder}")
 
 # 2. Define the pre-calculated profile columns
 profile_cols = [
@@ -176,7 +214,7 @@ for site in unique_sites:
         data=site_data, 
         x='PCA_1', 
         y='PCA_2', 
-        hue='Cluster_Labels', 
+        hue='Ordered_Cluster', 
         palette='viridis', 
         alpha=0.6, 
         s=50, 
@@ -190,10 +228,10 @@ for site in unique_sites:
     # --- Plot 2: Academic Profile (Bar Chart) ---
     # Efficiently extract the pre-calculated means
     # We drop duplicates because every student in the same cluster has the same mean value
-    profile_plot_data = site_data[['Cluster_Labels'] + profile_cols].drop_duplicates()
+    profile_plot_data = site_data[['Ordered_Cluster'] + profile_cols].drop_duplicates()
     
     # Set index for plotting and sort
-    profile_plot_data = profile_plot_data.set_index('Cluster_Labels').sort_index()
+    profile_plot_data = profile_plot_data.set_index('Ordered_Cluster').sort_index()
     
     # Clean up column names for the legend (Remove prefix)
     profile_plot_data.columns = [c.replace('Cluster_Mean_ST_Sgrade_', '') for c in profile_plot_data.columns]
@@ -204,7 +242,7 @@ for site in unique_sites:
     axes[1].set_title(f'Academic Performance by Cluster (Site: {site})')
     axes[1].set_ylabel('Weighted Mean Grade')
     axes[1].set_xlabel('Cluster Group')
-    axes[1].set_ylim(20, 50) # Adjust this range based on your data's scale
+    axes[1].set_ylim(0, 50) # Adjust this range based on your data's scale
     axes[1].grid(axis='y', linestyle='--', alpha=0.5, zorder=0)
     axes[1].legend(title='Subject', loc='lower right')
     
@@ -218,5 +256,4 @@ for site in unique_sites:
     
     print(f"Saved: {filename}")
 
-print("All plots generated.")
 # %%
