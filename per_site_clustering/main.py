@@ -50,6 +50,7 @@ features = [
 grade_columns = ['ST_Sgrade_Math', 'ST_Sgrade_Read_Lang', 'ST_Sgrade_Arts']
 
 results = {}
+pca_models = {}
 unique_sites = df_clean['ST_SiteID'].unique()
 
 for site in unique_sites:
@@ -87,6 +88,8 @@ for site in unique_sites:
     # 4. Fit PCA
     pca = PCA(n_components=0.95) 
     pca.fit(X_weighted_centered)
+
+    pca_models[site] = pca
     
     print(f"PCA Components: {pca.n_components_}")
     
@@ -257,3 +260,53 @@ for site in unique_sites:
     print(f"Saved: {filename}")
 
 # %%
+# Container for all site loadings
+all_loadings = []
+
+for site, pca_model in pca_models.items():
+    # pca.components_ has shape [n_components, n_features]
+    # We take the first row (PCA_1)
+    loadings = pd.DataFrame(
+        pca_model.components_, 
+        columns=features, 
+        index=[f'PCA_{i+1}' for i in range(pca_model.n_components_)]
+    )
+    
+    # Extract just PCA_1 for analysis
+    pca1_loadings = loadings.loc['PCA_1'].to_frame(name='Loading').reset_index()
+    pca1_loadings['SiteID'] = site
+    all_loadings.append(pca1_loadings)
+
+# Combine into one dataframe
+df_loadings = pd.concat(all_loadings)
+
+# -------------------------------------------------------
+# Visualization: What makes up PCA_1 across all sites?
+# -------------------------------------------------------
+
+plt.figure(figsize=(12, 6))
+
+# We plot the average loading of each feature on PCA_1 across all sites
+sns.barplot(
+    data=df_loadings, 
+    x='index', 
+    y='Loading', 
+    errorbar='sd', # Shows the standard deviation across sites
+    palette='RdBu'
+)
+
+plt.title("Deconstructing PCA_1: Feature Contributions (Average across Sites)")
+plt.xlabel("Feature")
+plt.ylabel("Loading on PCA_1 (Correlation)")
+plt.axhline(0, color='black', linewidth=1)
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+
+# -------------------------------------------------------
+# Interpretation Helper
+# -------------------------------------------------------
+print("\n--- Interpretation of PCA_1 ---")
+mean_loadings = df_loadings.groupby('index')['Loading'].mean().sort_values(ascending=False)
+print(mean_loadings)
