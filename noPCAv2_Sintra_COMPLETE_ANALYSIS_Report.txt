@@ -1,0 +1,86 @@
+================================================================================
+RAPORT ANALIZY KLASTRÓW SSES (FINLANDIA, N=712)
+================================================================================
+
+LEGENDA KOLUMN:
+ - Raw Weighted Mean: Średnia ważona w klastrze w oryginalnej skali punktowej.
+ - STD VAL (Z-Score): Wartość zestandaryzowana.
+   (Ile odchyleń standardowych średnia klastra różni się od średniej krajowej).
+   Wartości > +0.5 lub < -0.5 oznaczają silne natężenie cechy.
+--------------------------------------------------------------------------------
+
+ KLASTER 0  [Liczebność: 141 (19.8% populacji)]
+================================================================================
+ A. WYNIKI W NAUCE (Oceny)
+ PRZEDMIOT                 |  Raw Weighted Mean
+----------------------------------------------
+ ST_Sgrade_Math            |              25.10
+ ST_Sgrade_Read_Lang       |              25.31
+
+ B. PROFIL PSYCHOLOGICZNY I SPOŁECZNY
+ CECHA (TRAIT)             |  Raw Weighted Mean |  STD VAL (Z-Score)
+--------------------------------------------------------------------------------
+ ST_st_bully (*)           |              53.99 |               1.10
+ ST_st_anxtest (*)         |              57.68 |               0.51
+ ST_st_relpar              |              58.50 |               0.50
+ ST_RES_WLE_ADJ            |             511.68 |              -0.37
+ ST_SES                    |              -0.20 |              -0.38
+ ST_SEL_WLE_ADJ            |             542.94 |              -0.40
+ ST_st_relteach (*)        |              29.61 |              -0.58
+ ST_st_wellbeing (*)       |              31.13 |              -0.95
+ ST_st_belong (*)          |              28.75 |              -1.07
+ ST_st_friends (*)         |              30.62 |              -1.15
+
+================================================================================
+
+
+ KLASTER 1  [Liczebność: 221 (31.0% populacji)]
+================================================================================
+ A. WYNIKI W NAUCE (Oceny)
+ PRZEDMIOT                 |  Raw Weighted Mean
+----------------------------------------------
+ ST_Sgrade_Math            |              28.33
+ ST_Sgrade_Read_Lang       |              28.72
+
+ B. PROFIL PSYCHOLOGICZNY I SPOŁECZNY
+ CECHA (TRAIT)             |  Raw Weighted Mean |  STD VAL (Z-Score)
+--------------------------------------------------------------------------------
+ ST_SEL_WLE_ADJ (*)        |             645.95 |               0.77
+ ST_RES_WLE_ADJ (*)        |             597.54 |               0.75
+ ST_st_wellbeing (*)       |              38.53 |               0.59
+ ST_st_belong (*)          |              35.92 |               0.53
+ ST_st_friends             |              36.75 |               0.41
+ ST_st_relteach            |              33.71 |               0.36
+ ST_SES                    |               0.26 |               0.13
+ ST_st_anxtest             |              48.51 |              -0.25
+ ST_st_bully               |              41.91 |              -0.31
+ ST_st_relpar (*)          |              46.54 |              -0.78
+
+================================================================================
+
+
+ KLASTER 2  [Liczebność: 350 (49.2% populacji)]
+================================================================================
+ A. WYNIKI W NAUCE (Oceny)
+ PRZEDMIOT                 |  Raw Weighted Mean
+----------------------------------------------
+ ST_Sgrade_Math            |              26.70
+ ST_Sgrade_Read_Lang       |              27.01
+
+ B. PROFIL PSYCHOLOGICZNY I SPOŁECZNY
+ CECHA (TRAIT)             |  Raw Weighted Mean |  STD VAL (Z-Score)
+--------------------------------------------------------------------------------
+ ST_st_relpar              |              56.74 |               0.31
+ ST_st_friends             |              35.93 |               0.20
+ ST_st_belong              |              33.92 |               0.08
+ ST_SES                    |               0.21 |               0.07
+ ST_st_relteach            |              32.12 |              -0.00
+ ST_st_wellbeing           |              35.68 |              -0.00
+ ST_st_anxtest             |              50.97 |              -0.04
+ ST_st_bully               |              42.44 |              -0.24
+ ST_SEL_WLE_ADJ            |             548.11 |              -0.34
+ ST_RES_WLE_ADJ            |             513.90 |              -0.34
+
+================================================================================
+
+

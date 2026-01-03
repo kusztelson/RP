@@ -9,7 +9,7 @@ import seaborn as sns
 n_clusters = 3
 grade_cols = ['ST_Sgrade_Math', 'ST_Sgrade_Read_Lang']
 weight_col = 'ST_WT2019'
-file_prefix = "Istanbul_WEIGHTED_V2" # Nowa wersja pliku
+file_prefix = "Suzhou_WEIGHTED_V2" # Nowa wersja pliku
 
 
 
@@ -22,7 +22,7 @@ df = pd.read_csv("INT_Final_Merged_Prefixed.csv")
 df_st_filter = pd.read_csv("data_full_data_withoutArts.csv")
 df = df[df['Username_Std'].isin(df_st_filter['Username_Std'])]
 print(df['ST_SiteID'].unique)
-df_fin = df[df['ST_SiteID'] == 8.0]
+df_fin = df[df['ST_SiteID'] == 11.0]
 print("Number of finns in dataset", len(df_fin))
 print("Inside finns Site", df_fin.groupby(['ST_CohortID','ST_Gender_Std']).size())
 
