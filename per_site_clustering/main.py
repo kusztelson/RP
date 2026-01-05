@@ -72,25 +72,47 @@ for site in unique_sites:
     w = site_data['Rescaled_Weight'].values
     
     # ---------------------------------------------------------
-    # B. Weighted PCA (Square Root Weight Method)
+    # B. Stratified Standardization (The Modification)
     # ---------------------------------------------------------
+    
+    # 1. Create a placeholder matrix for the standardized data
+    # We must ensure it aligns with the current site_data index
+    X_std = np.zeros_like(X)
+    
+    # 2. Iterate through each subgroup (Cohort x Gender)
+    # This forces the mean of EACH group to be 0
+    groups = site_data.groupby(['ST_CohortID', 'ST_Gender_Std'])
+    
+    for (cohort, gender), group_indices in groups.groups.items():
+        # Get the row numbers (integer positions) for this group
+        # We need integer positions to slice the numpy array 'X' correctly
+        # But group_indices are index LABELS. 
+        # Safer approach: Boolean mask
+        mask = (site_data['ST_CohortID'] == cohort) & (site_data['ST_Gender_Std'] == gender)
+        
+        # Extract subset
+        X_sub = X[mask]
+        w_sub = w[mask]
+        
+        # Fit Scaler specific to this Age/Gender group
+        scaler = StandardScaler()
+        scaler.fit(X_sub, sample_weight=w_sub)
+        
+        # Transform and place back into the main matrix
+        X_std[mask] = scaler.transform(X_sub)
 
-    scaler = StandardScaler()
-    
-    # Critical: Fit with sample_weight to get Weighted Mean and Weighted Std
-    scaler.fit(X, sample_weight=w)
-    
-    # Transform: This makes Mean=0 and Std=1 for all columns
-    X_std = scaler.transform(X)
+    # ---------------------------------------------------------
+    # Resume existing flow
+    # ---------------------------------------------------------
     
     # 3. Apply Square Root Weight for PCA calculation only
-    # We apply this to the STANDARDIZED data now
+    # We apply this to the now STRATIFIED standardized data
     w_sqrt = np.sqrt(w).reshape(-1, 1)
-    X_weighted_std = X_std * w_sqrt   # <--- Changed X_centered to X_std
+    X_weighted_std = X_std * w_sqrt 
     
     # 4. Fit PCA
     pca = PCA(n_components=0.95) 
-    pca.fit(X_weighted_std)           # <--- Changed input to X_weighted_std
+    pca.fit(X_weighted_std)
 
     pca_models[site] = pca
     
