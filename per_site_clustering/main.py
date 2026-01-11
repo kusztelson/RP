@@ -337,6 +337,51 @@ print("\n--- Interpretation of PCA_1 ---")
 mean_loadings = df_loadings.groupby('index')['Loading'].mean().sort_values(ascending=False)
 print(mean_loadings)
 
+# %%
+# Container for PCA_2 loadings
+all_loadings_pca2 = []
+
+for site, pca_model in pca_models.items():
+    # Create a DataFrame for the components
+    loadings = pd.DataFrame(
+        pca_model.components_, 
+        columns=features, 
+        index=[f'PCA_{i+1}' for i in range(pca_model.n_components_)]
+    )
+    
+    # Check if PCA_2 exists for this site
+    if 'PCA_2' in loadings.index:
+        # Extract just PCA_2
+        pca2_loadings = loadings.loc['PCA_2'].to_frame(name='Loading').reset_index()
+        pca2_loadings['SiteID'] = site
+        all_loadings_pca2.append(pca2_loadings)
+
+# Combine into one dataframe
+df_loadings_pca2 = pd.concat(all_loadings_pca2)
+
+# -------------------------------------------------------
+# Visualization: What makes up PCA_2?
+# -------------------------------------------------------
+
+plt.figure(figsize=(12, 6))
+
+# Plotting loadings for PCA_2
+sns.barplot(
+    data=df_loadings_pca2, 
+    x='index', 
+    y='Loading', 
+    errorbar='sd', # Standard deviation shows how consistent this pattern is across sites
+    palette='BrBG' # Using a different palette (Brown-Green) to distinguish from PCA 1
+)
+
+plt.title("Deconstructing PCA_2: Feature Contributions (Average across Sites)")
+plt.xlabel("Feature")
+plt.ylabel("Loading on PCA_2")
+plt.axhline(0, color='black', linewidth=1)
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
 
 # %%
 # Assuming 'final_df' is your result from the previous step
@@ -374,4 +419,40 @@ for site in unique_sites:
     counts = site_data['Cluster_Labels'].value_counts().sort_index()
     print("\n--- Total Students per Cluster ---")
     print(counts)
+# %%
+import numpy as np
+import pandas as pd
+
+# The grades we are checking
+grade_columns = ['ST_Sgrade_Math', 'ST_Sgrade_Read_Lang', 'ST_Sgrade_Arts']
+unique_sites = final_df['ST_SiteID'].unique()
+
+print(f"{'Site':<10} | {'Math Rising?':<12} | {'Read Rising?':<12} | {'Arts Rising?':<12} | {'ALL RISING?'}")
+print("-" * 70)
+
+for site in unique_sites:
+    site_data = final_df[final_df['ST_SiteID'] == site]
+    
+    # 1. Calculate Weighted Means for each Cluster
+    # We group by label (0, 1, 2) and compute the weighted avg for each grade
+    means = site_data.groupby('Ordered_Cluster')[grade_columns].apply(
+        lambda x: pd.Series({
+            col: np.average(x[col], weights=site_data.loc[x.index, 'Rescaled_Weight']) 
+            for col in grade_columns
+        })
+    )
+    
+    # 2. Check the "0 < 1 < 2" condition for each subject
+    # We use .get() to handle cases where a cluster might be missing (rare)
+    try:
+        math_check = means.loc[0, 'ST_Sgrade_Math'] < means.loc[1, 'ST_Sgrade_Math'] < means.loc[2, 'ST_Sgrade_Math']
+        read_check = means.loc[0, 'ST_Sgrade_Read_Lang'] < means.loc[1, 'ST_Sgrade_Read_Lang'] < means.loc[2, 'ST_Sgrade_Read_Lang']
+        arts_check = means.loc[0, 'ST_Sgrade_Arts'] < means.loc[1, 'ST_Sgrade_Arts'] < means.loc[2, 'ST_Sgrade_Arts']
+        
+        all_check = math_check and read_check and arts_check
+        
+        print(f"{site:<10.0f} | {str(math_check):<12} | {str(read_check):<12} | {str(arts_check):<12} | {str(all_check)}")
+        
+    except KeyError:
+        print(f"{site:<10.0f} | {'ERROR: Missing Cluster (Empty Group)':<40}")
 # %%
