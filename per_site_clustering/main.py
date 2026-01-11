@@ -111,7 +111,7 @@ for site in unique_sites:
     X_weighted_std = X_std * w_sqrt 
     
     # 4. Fit PCA
-    pca = PCA(n_components=0.95) 
+    pca = PCA(n_components=2) 
     pca.fit(X_weighted_std)
 
     pca_models[site] = pca
@@ -336,3 +336,42 @@ plt.show()
 print("\n--- Interpretation of PCA_1 ---")
 mean_loadings = df_loadings.groupby('index')['Loading'].mean().sort_values(ascending=False)
 print(mean_loadings)
+
+
+# %%
+# Assuming 'final_df' is your result from the previous step
+unique_sites = final_df['ST_SiteID'].unique()
+
+for site in unique_sites:
+    print(f"\n{'='*40}")
+    print(f"DEMOGRAPHIC CHECK FOR SITE: {site}")
+    print(f"{'='*40}")
+    
+    site_data = final_df[final_df['ST_SiteID'] == site]
+    
+    # 1. Check Cohort Balance
+    # normalize='index' shows the percentage within each cluster
+    cohort_tab = pd.crosstab(
+        site_data['Cluster_Labels'], 
+        site_data['ST_CohortID'], 
+        normalize='index'
+    ) * 100
+    
+    print("\n--- Cohort Distribution (Percentage per Cluster) ---")
+    print(cohort_tab.round(1).astype(str) + '%')
+    
+    # 2. Check Gender Balance
+    gender_tab = pd.crosstab(
+        site_data['Cluster_Labels'], 
+        site_data['ST_Gender_Std'], 
+        normalize='index'
+    ) * 100
+    
+    print("\n--- Gender Distribution (Percentage per Cluster) ---")
+    print(gender_tab.round(1).astype(str) + '%')
+    
+    # 3. Check Raw Counts (to ensure no tiny clusters)
+    counts = site_data['Cluster_Labels'].value_counts().sort_index()
+    print("\n--- Total Students per Cluster ---")
+    print(counts)
+# %%
