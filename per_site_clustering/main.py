@@ -75,31 +75,38 @@ for site in unique_sites:
     # B. Stratified Standardization (The Modification)
     # ---------------------------------------------------------
     
-    # 1. Create a placeholder matrix for the standardized data
-    # We must ensure it aligns with the current site_data index
-    X_std = np.zeros_like(X)
+    # 1. Create new columns for Z-scores in the dataframe
+    z_features = [f"Z_{col}" for col in features]
+    # Initialize with NaN
+    for z_col in z_features:
+        site_data[z_col] = np.nan
     
     # 2. Iterate through each subgroup (Cohort x Gender)
-    # This forces the mean of EACH group to be 0
     groups = site_data.groupby(['ST_CohortID', 'ST_Gender_Std'])
     
     for (cohort, gender), group_indices in groups.groups.items():
-        # Get the row numbers (integer positions) for this group
-        # We need integer positions to slice the numpy array 'X' correctly
-        # But group_indices are index LABELS. 
-        # Safer approach: Boolean mask
+        # Boolean mask for this group
         mask = (site_data['ST_CohortID'] == cohort) & (site_data['ST_Gender_Std'] == gender)
         
-        # Extract subset
-        X_sub = X[mask]
-        w_sub = w[mask]
-        
-        # Fit Scaler specific to this Age/Gender group
-        scaler = StandardScaler()
-        scaler.fit(X_sub, sample_weight=w_sub)
-        
-        # Transform and place back into the main matrix
-        X_std[mask] = scaler.transform(X_sub)
+        # Check if group has data (safety check)
+        if mask.sum() > 1:
+            # Extract raw data and weights for this group
+            X_sub = site_data.loc[mask, features].values
+            w_sub = site_data.loc[mask, 'Rescaled_Weight'].values
+            
+            # Fit Scaler specific to this Age/Gender group
+            scaler = StandardScaler()
+            scaler.fit(X_sub, sample_weight=w_sub)
+            
+            # Transform and save DIRECTLY to the dataframe
+            site_data.loc[mask, z_features] = scaler.transform(X_sub)
+        else:
+            # Handle rare edge case of groups with 0 or 1 student
+            site_data.loc[mask, z_features] = 0 # Fallback to mean (0)
+
+    # 3. Create the X_std matrix from the dataframe for PCA use
+    # We fill NaNs with 0 just in case a group was skipped, though unlikely
+    X_std = site_data[z_features].fillna(0).values
 
     # ---------------------------------------------------------
     # Resume existing flow
@@ -455,4 +462,92 @@ for site in unique_sites:
         
     except KeyError:
         print(f"{site:<10.0f} | {'ERROR: Missing Cluster (Empty Group)':<40}")
+# %%
+# ---------------------------------------------------------
+# 1. Setup Columns and Labels
+# ---------------------------------------------------------
+# The list of Z-score columns we created in the loop
+z_features = [f"Z_{col}" for col in features]
+
+# Mapping for the legend (Adjust if your clusters 0/1/2 mean something else)
+# Viridis colors: 0=Purple (Dark), 1=Teal, 2=Yellow (Bright)
+cluster_names = {
+    0: '0: Vulnerable / Developing',
+    1: '1: Moderate / Average',
+    2: '2: High-Mastery / Thriving'
+}
+
+# ---------------------------------------------------------
+# 2. Calculate Weighted Means per Cluster
+# ---------------------------------------------------------
+cluster_profile_data = []
+
+# We group by the Ordered_Cluster to ensure the hierarchy (0 -> 1 -> 2)
+sorted_clusters = sorted(final_df['Ordered_Cluster'].unique())
+
+for cluster in sorted_clusters:
+    # Filter for this cluster
+    mask = final_df['Ordered_Cluster'] == cluster
+    
+    # Check if cluster exists (safety)
+    if mask.sum() == 0: continue
+
+    # Dictionary to store this cluster's averages
+    cluster_stats = {'Ordered_Cluster': cluster}
+    
+    # Calculate weighted mean for each feature
+    current_weights = final_df.loc[mask, 'Rescaled_Weight']
+    
+    for raw_feat, z_feat in zip(features, z_features):
+        # We grab the Z-score column
+        current_values = final_df.loc[mask, z_feat]
+        
+        # Compute Weighted Average
+        w_avg = np.average(current_values, weights=current_weights)
+        cluster_stats[raw_feat] = w_avg 
+        
+    cluster_profile_data.append(cluster_stats)
+
+# Create summary dataframe
+df_profile = pd.DataFrame(cluster_profile_data)
+
+# ---------------------------------------------------------
+# 3. Reshape for Seaborn ("Long" Format)
+# ---------------------------------------------------------
+df_long = df_profile.melt(
+    id_vars='Ordered_Cluster', 
+    var_name='Skill', 
+    value_name='Mean_Z_Score'
+)
+
+# Add readable names
+df_long['Cluster_Label'] = df_long['Ordered_Cluster'].map(cluster_names)
+
+# ---------------------------------------------------------
+# 4. Visualization
+# ---------------------------------------------------------
+plt.figure(figsize=(14, 8))
+
+sns.pointplot(
+    data=df_long, 
+    x='Skill', 
+    y='Mean_Z_Score', 
+    hue='Cluster_Label',
+    palette='viridis',      # Matches your scatterplot
+    markers=['o', 's', '^'], # Circle, Square, Triangle for accessibility
+    scale=1.0,               # Size of markers
+    linestyles=['-', '--', '-.'] # Solid, Dashed, Dash-dot
+)
+
+# Visual polish
+plt.axhline(0, color='black', linewidth=1.5, linestyle=':', alpha=0.6, label='Global Average (0)')
+plt.title('Standardized Profiles of Student Clusters (Weighted Means)', fontsize=16)
+plt.ylabel('Score Relative to Peer Group (Z-Score)', fontsize=12)
+plt.xlabel('Social & Emotional Skill Domain', fontsize=12)
+plt.xticks(rotation=45, ha='right')
+plt.legend(title='Student Typology', bbox_to_anchor=(1.01, 1), loc='upper left')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+plt.show()
 # %%
