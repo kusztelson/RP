@@ -145,3 +145,51 @@ for cluster_id in range(n_clusters):
         w_avg_read = np.average(subset['ST_Sgrade_Read_Lang'], weights=subset['Rescaled_Weight'])
         w_avg_art = np.average(subset['ST_Sgrade_Arts'], weights=subset['Rescaled_Weight'])
         print(f"Cluster {cluster_id}: Math={w_avg_math:.2f}, Read={w_avg_read:.2f}, Art={w_avg_art:.2f}, N={len(subset)}")
+        
+        
+
+# 1. Calculate the weighted means and store in a DataFrame
+cluster_stats = []
+for cluster_id in range(n_clusters):
+    subset = df_clean[df_clean['Cluster'] == cluster_id]
+    if len(subset) > 0:
+        row = {'Cluster': cluster_id}
+        for col in grade_cols:
+            row[col] = np.average(subset[col], weights=subset['Rescaled_Weight'])
+        cluster_stats.append(row)
+
+profile_plot_data = pd.DataFrame(cluster_stats).set_index('Cluster').sort_index()
+
+# 2. Clean up column names for the legend (Remove prefix)
+# This mimics your c.replace logic to keep the legend tidy
+profile_plot_data.columns = [c.replace('ST_Sgrade_', '') for c in profile_plot_data.columns]
+
+# 3. Create the Plot using the requested layout
+fig, ax = plt.subplots(figsize=(8, 6))
+
+profile_plot_data.plot(
+    kind='bar', 
+    ax=ax, 
+    colormap='Paired', 
+    edgecolor='black', 
+    zorder=3
+)
+
+# 4. Styling based on your provided layout
+ax.set_title(f'Academic Performance by Cluster (Istanbul)')
+ax.set_ylabel('Weighted Mean Grade')
+ax.set_xlabel('Cluster Group')
+
+# Note: Adjust ylim (e.g., 0, 50 or 0, 5) based on your specific grade scale
+ax.set_ylim(0, profile_plot_data.values.max() * 1.2) 
+
+ax.grid(axis='y', linestyle='--', alpha=0.5, zorder=0)
+ax.legend(title='Subject', loc='upper right')
+
+# 5. Save and Close
+plt.tight_layout()
+filename = f"{file_prefix}_Final_Cluster_Performance.png"
+plt.savefig(filename, dpi=300)
+plt.show()
+
+print(f"Final chart saved as: {filename}")
