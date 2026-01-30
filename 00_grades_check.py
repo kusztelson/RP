@@ -1,8 +1,10 @@
 # %%
 import pyreadstat
 import pandas as pd
+import os
+from Utils import get_data_path
 # Load the .sav file
-df, meta = pyreadstat.read_sav("INT_01_ST_(2021.04.14)_Public.sav")
+df, meta = pyreadstat.read_sav(os.path.join(get_data_path(), "INT_01_ST_(2021.04.14)_Public.sav"))
 
 
 print(len(df))

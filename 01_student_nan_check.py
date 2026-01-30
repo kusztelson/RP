@@ -1,6 +1,11 @@
+import os
+
 import pandas as pd
 import numpy as np
 import pyreadstat
+
+from Utils import get_data_path
+
 
 def get_student_missing_codes(col_name):
     """
@@ -125,6 +130,8 @@ def check_student_file(file_path):
     
     print("-" * 60)
 
+
 # Run the check
 # Ensure the filename matches your local file
-check_student_file('INT_01_ST_(2021.04.14)_Public.sav')
+check_student_file(os.path.join(get_data_path(),
+                                "INT_01_ST_(2021.04.14)_Public.sav"))

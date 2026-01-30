@@ -1,6 +1,11 @@
+import os
+
 import pandas as pd
 import numpy as np
 import pyreadstat
+
+from Utils import get_data_path
+
 
 def get_parent_missing_codes(col_name):
     """
@@ -112,4 +117,5 @@ def check_parent_file_comprehensive(file_path):
     print("-" * 60)
 
 # Execute
-check_parent_file_comprehensive('INT_02_PA_(2021.04.14)_Public.sav')
+check_parent_file_comprehensive(
+    os.path.join(get_data_path(), 'INT_02_PA_(2021.04.14)_Public.sav'))
