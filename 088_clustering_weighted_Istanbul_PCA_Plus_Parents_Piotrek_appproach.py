@@ -6,6 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.backends.backend_pdf import PdfPages
 
 # --- SETTINGS ---
 n_clusters = 3
@@ -31,6 +32,25 @@ features = [
     "ST_st_wellbeing", "ST_st_anxtest", "ST_SES" ,
     "PA_pa_comm", "PA_pa_wellbeing", "PA_pa_engage", "PA_pa_encour"
 ]
+
+# Feature label mapping for explainable names
+feature_labels = {
+    "ST_RES_WLE_ADJ": "Responsibility",
+    "ST_SEL_WLE_ADJ": "Self-control",
+    "ST_PER_WLE_ADJ": "Persistence",
+    "ST_st_relteach": "Teacher Relations",
+    "ST_st_bully": "Bullying",
+    "ST_st_belong": "School Belonging",
+    "ST_st_friends": "Friend Relations",
+    "ST_st_relpar": "Parent Relations",
+    "ST_st_wellbeing": "Wellbeing",
+    "ST_st_anxtest": "School Anxiety",
+    "ST_SES": "Socioeconomic Status",
+    "PA_pa_comm": "Parental Community Closeness",
+    "PA_pa_wellbeing": "Parental Wellbeing",
+    "PA_pa_engage": "Parental Engagement",
+    "PA_pa_encour": "Parental Need for Encouragement"
+}
 
 df_clean = df_sub[features + grade_cols + [weight_col]].dropna().reset_index(drop=True)
 print(f"Number of students after clearing dataset: {len(df_clean)}")
@@ -59,7 +79,7 @@ X_pca_data = pca.fit_transform(X_weighted_std)
 loadings_df = pd.DataFrame(
     pca.components_.T, 
     columns=['PC1', 'PC2'], 
-    index=features
+    index=[feature_labels[f] for f in features]
 )
 
 # --- 4. WEIGHTED K-MEANS ---
@@ -87,6 +107,7 @@ sns.heatmap(loadings_df, annot=True, cmap='coolwarm', center=0, fmt='.2f', linew
 plt.title('PCA Loadings - Istanbul')
 plt.tight_layout()
 plt.savefig(f"{file_prefix}_PCA_Loadings_{n_clusters}.jpg", dpi=300)
+plt.savefig(f"{file_prefix}_PCA_Loadings_{n_clusters}.pdf")
 plt.show()
 
 # --- PLOT 2: SCATTER PLOT (CLUSTERS) ---
@@ -95,6 +116,7 @@ sns.scatterplot(x='PCA1', y='PCA2', hue='Cluster', data=df_clean, palette='virid
 plt.title('KMeans Clusters')
 plt.tight_layout()
 plt.savefig(f"{file_prefix}_Clusters_Scatter_{n_clusters}.jpg", dpi=300)
+plt.savefig(f"{file_prefix}_Clusters_Scatter_{n_clusters}.pdf")
 plt.show()
 
 # --- PLOT 3: BOX PLOT (GRADES) ---
@@ -108,6 +130,7 @@ plt.title('Weighted Grade Distribution by Ordered Cluster')
 plt.xticks(rotation=15)
 plt.tight_layout()
 plt.savefig(f"{file_prefix}_Grades_Boxplot_{n_clusters}.jpg", dpi=300)
+plt.savefig(f"{file_prefix}_Grades_Boxplot_{n_clusters}.pdf")
 plt.show()
 
 # --- PLOT 4 & 5: FEATURE CONTRIBUTIONS (BAR CHARTS) ---
@@ -123,6 +146,7 @@ plt.xticks(rotation=45, ha='right')
 plt.axhline(0, color='black', linewidth=1)
 plt.tight_layout()
 plt.savefig(f"{file_prefix}_PCA1_BarChart.jpg", dpi=300)
+plt.savefig(f"{file_prefix}_PCA1_BarChart.pdf")
 plt.show()
 
 # PC2 Contributions
@@ -134,6 +158,7 @@ plt.xticks(rotation=45, ha='right')
 plt.axhline(0, color='black', linewidth=1)
 plt.tight_layout()
 plt.savefig(f"{file_prefix}_PCA2_BarChart.jpg", dpi=300)
+plt.savefig(f"{file_prefix}_PCA2_BarChart.pdf")
 plt.show()
 
 # --- FINAL STATS PRINT ---
@@ -190,6 +215,7 @@ ax.legend(title='Subject', loc='upper right')
 plt.tight_layout()
 filename = f"{file_prefix}_Final_Cluster_Performance.png"
 plt.savefig(filename, dpi=300)
+plt.savefig(f"{file_prefix}_Final_Cluster_Performance.pdf")
 plt.show()
 
 print(f"Final chart saved as: {filename}")
