@@ -220,5 +220,5 @@ def plot_heatmap(data_2d, x_labels, y_labels, title):
 
 
 def get_data_path():
-    path = os.path.abspath("C:/Users/ppp/Documents/Witek/Studia/Laby/Research Project/main project/data")
+    path = os.path.abspath("absolute/path/to/data")
     return path

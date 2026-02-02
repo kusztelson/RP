@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import seaborn as sns
 
+
 SAVE_DIR = "plots"
 
 
@@ -47,10 +48,14 @@ def plot_tree(tree_model: tree.DecisionTreeRegressor, plot_suffix: str, feature_
     if site != "":
         dir_path = os.path.join(SAVE_DIR, site)
 
+    if not os.path.isdir(dir_path):
+        os.makedirs(dir_path)
+
     plt.savefig(os.path.join(dir_path, filename),
                 dpi=300
                 )
     # plt.show()
+    plt.close()
 
 
 def plot_true_vs_pred(x_true_train, x_pred_train, x_true_test, x_pred_test, title):
@@ -200,12 +205,8 @@ for site in df["ST_SiteID"].unique().tolist():
                                              **tree_params)
 
             name = f"site: {site_codes[site]}, model: {model_x_names[model_id]}, predicting: {y_col}"
-            # while True:
-            #     try:
-            #         plot_tree(tree_model, name, list(X_df.columns), max_depth, site=site_codes[site])
-            #         break
-            #     except HTTPError:
-            #         time.sleep(10)
+            print(name)
+            plot_tree(tree_model, name, list(X_df.columns), max_depth, site=site_codes[site])
 
             y_pred_train = tree_model.predict(data[0])
             r2_train = r2_score(data[2], y_pred_train)
@@ -213,8 +214,8 @@ for site in df["ST_SiteID"].unique().tolist():
             y_pred = tree_model.predict(data[1])
             r2_test = r2_score(data[3], y_pred)
 
-            plot_true_vs_pred(data[2], y_pred_train, data[3], y_pred,
-                              f"True vs Predicted: ({site_codes[site]}, {model_x_names[model_id]}, {y_col})")
+            # plot_true_vs_pred(data[2], y_pred_train, data[3], y_pred,
+            #                   f"True vs Predicted: ({site_codes[site]}, {model_x_names[model_id]}, {y_col})")
 
             # grade_cols = ['ST_Sgrade_Math', 'ST_Sgrade_Read_Lang', 'ST_Sgrade_Arts', 'ST_Grade_Mean']
 
