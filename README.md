@@ -1,1 +1,5 @@
-We assume that all 3 .sav files with data (student,teacher,parents) with no changes to file names after download are located in main folder. Download link: https://www.oecd.org/en/data/datasets/SSES-Round-1-Database.html#codebooks Then files from 00 to 06 should be executed then `main.py` inside `per_site_clustering` folder.
+We assume that all 3 .sav files with data (student,teacher,parents) with no changes to file names after download are located in main folder. 
+
+Download link: https://www.oecd.org/en/data/datasets/SSES-Round-1-Database.html#codebooks 
+
+Then files from 00 to 06 should be executed then `main.py` inside `per_site_clustering` folder.
