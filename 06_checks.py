@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import pyreadstat
+import os
+from Utils import get_data_path
 
 # Files to compare
 FILE_ORIG_ST = 'INT_01_ST_(2021.04.14)_Public.sav'
@@ -11,9 +13,9 @@ FILE_NEW     = 'INT_Final_Merged_Prefixed.sav'
 def compare_datasets():
     print("--- LOADING DATASETS FOR COMPARISON ---\n")
     try:
-        df_st, meta_st = pyreadstat.read_sav(FILE_ORIG_ST)
-        df_pa, meta_pa = pyreadstat.read_sav(FILE_ORIG_PA)
-        df_tc, meta_tc = pyreadstat.read_sav(FILE_ORIG_TC)
+        df_st, meta_st = pyreadstat.read_sav(os.path.join(get_data_path(), FILE_ORIG_ST))
+        df_pa, meta_pa = pyreadstat.read_sav(os.path.join(get_data_path(), FILE_ORIG_PA))
+        df_tc, meta_tc = pyreadstat.read_sav(os.path.join(get_data_path(), FILE_ORIG_TC))
         df_new, meta_new = pyreadstat.read_sav(FILE_NEW)
     except Exception as e:
         print(f"Error loading files: {e}")
